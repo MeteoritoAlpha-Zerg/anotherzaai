@@ -16,6 +16,28 @@ stages:
     code_to_run: !python/program 'stages/2-stage-data.py'
 
 tests:
+- description: "Handle API Errors and Network Timeouts"
+  preconditions: "Simulated network error or invalid configuration."
+  postconditions: "Connector gracefully handles errors and logs appropriate messages."
+  function_to_run: !python/function |
+    def test_handle_api_errors(zerg_state=None):
+        """Test error handling for API errors in the Google Headlines connector."""
+        print("Testing error handling for Google Headlines connector")
+
+        # Attempt to import the GoogleHeadlinesConnector object.
+        from headlines import GoogleHeadlinesConnector
+
+        connector = GoogleHeadlinesConnector()
+
+        # Simulate an error by setting an unrealistic timeout
+        original_timeout = connector.config.get('timeout', 10)
+        connector.config['timeout'] = 0.001
+        response = connector.get_top_headline()
+                
+        # Expect a failure response or an exception
+        assert response is None or "error" in str(response).lower(), "Error handling did not trigger"
+
+        connector.config['timeout'] = original_timeout
 -   description: This checks to see that the connector is able to return a listing of tools
     preconditions: A data connector implementation per the provided interfaces
     postconditions: The data connector is able to provide a list of supported tools and interfaces
