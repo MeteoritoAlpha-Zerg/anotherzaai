@@ -1,5 +1,5 @@
 domains:
-  case_management:            !include case_management.yaml
+  case_management:            !include domains/case_management/case_management.yaml
 
 # common
 
